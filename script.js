@@ -4,6 +4,7 @@
     the game's features.
 */
 
+console.log("js is connected")
 
 // These are all the symbols that the game is going to use
 const symbols = ['🍎', '🍌', '🍇', '🍓', '🍍', '🍉', '🍒', '🥝'];
@@ -23,6 +24,24 @@ let lockBoard = false;
 */
 function initGame() {
     // Write your code here
+    let boardDiv = document.getElementById("game-board")
+
+    // Resetting the entire game board
+    boardDiv.innerHTML = ""
+    cards = []
+    resetBoard()
+
+    // Generating cards
+    for (let i = 0; i < symbols.length; i++) {
+        cards.push(createCard(symbols[i]))
+        cards.push(createCard(symbols[i]))
+    }
+
+    // Displaying the cards on the board
+    shuffleArray(cards)
+    for (let i = 0; i < cards.length; i++) {
+        boardDiv.appendChild(cards[i])
+    }
 
     document.getElementById('restart-btn').addEventListener('click', initGame);
 }
@@ -34,6 +53,12 @@ function initGame() {
 */
 function createCard(symbol) {
     // Write your code here
+    let card = document.createElement("div")
+    card.classList.add("card")
+    card.dataset.symbol = symbol
+    card.addEventListener("click", ()=>flipCard(card))
+
+    return card
 }
 
 /*
@@ -48,6 +73,20 @@ function flipCard(card) {
     // If the board is supposed to be locked or you picked the same card you already picked
     if (lockBoard || card === firstCard) return;
     // Write your code here
+
+    // Flipping the card
+    card.classList.add("flipped")
+    let symbol = card.dataset.symbol
+    card.innerHTML = `<h1>${symbol}</h1>`
+
+    // Assigning card number
+    if (firstCard === null) {
+        firstCard = card
+    } else {
+        secondCard = card
+        checkForMatch()
+    }
+
 }
 
 /* 
@@ -57,6 +96,19 @@ function flipCard(card) {
 */
 function checkForMatch() {
     // Write your code here
+    let firstSymb = firstCard.dataset.symbol
+    let secondSymb = secondCard.dataset.symbol
+
+    // Checking for match
+    if (firstSymb === secondSymb) {
+        console.log("match found")
+        disableCards()
+        resetBoard()
+    } else {
+        console.log("not a match :(")
+        console.log(`${firstSymb}, ${secondSymb}`)
+        unflipCards()
+    }
 }
 
 /* 
@@ -65,7 +117,9 @@ function checkForMatch() {
     to reset the firstCard, secondCard, and lockBoard variables. (That's been written for you already)
 */
 function disableCards() {
-    // Write your code here
+    firstCard.classList.add("matched")
+    secondCard.classList.add("matched")
+    resetBoard()
 }
  
 /* ---------------------  Everything under has already been done for you -------------------------- */
@@ -77,6 +131,8 @@ function unflipCards() {
 
     // The cards will be flipped back after 1 second and the board will be reset
     // The 1 second is to give the user time to actaully see the card so they can memorize them before they unflip
+    console.log(firstCard)
+    console.log(secondCard)
     setTimeout(() => {
         firstCard.classList.remove('flipped');
         secondCard.classList.remove('flipped');
